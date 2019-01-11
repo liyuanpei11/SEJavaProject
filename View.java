@@ -24,6 +24,22 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * Die Class View ist nur für die visuelle Darstellung des Programms zuständig.
+ * <br> Um alle nötigen Funktionen von JavaFX nutzen zu können, muss man die Class View um die JavaFx Class Application erweitern.
+ * Hier werden alle Fenster, Textfelder und Knöpfe im vorhinein festgelegt. 
+ * Die Daten für die Tabellen oder Textfelder bezieht die View Class direkt von der Model Class.
+ * Alle anderen aktiven Bedienungen des Benutzers werden an die Controller Class übergeben und dort weiter verarbeitet.
+ * 
+ * @author Didem Güngör 	(Mat-Nr. 772703)
+ * @author Wisal Elzakzouk	(Mat-Nr. 782102)
+ * @author Florian Schubart	(Mat-Nr. 772093)    
+ * @author Mohamad Doulabi 	(Mat-Nr. 775713)    
+ * @author Richard Li		(Mat-Nr. 795238)
+ * @version Java 8
+ * @since 1.0
+ * 
+ */
 public class View extends Application {
 	
 	//Hauptfenster
@@ -64,7 +80,14 @@ public class View extends Application {
 	@SuppressWarnings("unchecked")
 	@Override
 	
+	/**
+	 * In dieser Methode wird das Hauptfenster initialisert. 
+	 * <br> Das Hauptfenster verbindet alle grafischen Fenster miteinander, welche über Buttons aufgerufen werden können.
+	 * Hier werden die Daten aus der Datenbank mithilfe der Tabelle dargestellt.
+	 * Desweiteren kann man eine Suche nach beliebiger Eingabe starten.
+	 */
 	public void start(Stage primaryStage) {
+		Model.readcsv("penfactory.csv");
 		try {
 			window = primaryStage;
 			window.setTitle("Penfactory - Datenbank");
@@ -125,7 +148,7 @@ public class View extends Application {
 			// Bearbeiten - Knopf
 			Button editButton = new Button("Bearbeiten");
 			editButton.setOnAction(e -> {
-				if (Controller.checkselect()) {	
+				if (!Controller.checkselect()) {	
 					Controller.warnungFenster("Sie haben kein Element ausgewählt!");
 				} else {
 					editwindow();
@@ -139,7 +162,7 @@ public class View extends Application {
 			// Löschen - Knopf
 			Button deleteButton = new Button("Löschen");
 			deleteButton.setOnAction(e -> {
-				if (Controller.checkselect()) {
+				if (!Controller.checkselect()) {
 					Controller.warnungFenster("Sie haben kein Element ausgewählt!");
 				} else {
 					if (Controller.confirmdeletewindow()) {
@@ -161,7 +184,7 @@ public class View extends Application {
 			table.setItems(Model.objektliste);
 			table.getColumns().addAll(nameColumn,platzColumn,preisColumn,anzahlColumn,gewichtColumn,gesamtgewichtColumn,kategorieColumn,eigenschaftenColumn);
 			
-			mainChoiceBox.getItems().addAll("Name", "Platz", "Kategorie", "Eigenschaften");
+			mainChoiceBox.getItems().addAll("Name", "Platz", "Preis", "Anzahl", "Gewicht", "Kategorie", "Eigenschaften");
 			mainChoiceBox.setValue("Name");
 			
 			// Suchleiste
@@ -207,6 +230,10 @@ public class View extends Application {
 		} 
 	}
 	
+	/**
+	 * Diese Methode initiert das "Eintrag hinzufügen" Fenster. 
+	 * <br> Der Benutzer kann hier die Produkteigenschaften eingeben und in die Datenbank abspeichern.
+	 */
 	public static void addwindow() {
 		
 		// Eintrag hinzufügen - Fenster
@@ -244,14 +271,14 @@ public class View extends Application {
 		addlabel3.setText("Produktpreis (€):");
 		//preis input
 		preisInput = new TextField();
-		preisInput.setPromptText("Produktpreis (€)");
+		preisInput.setPromptText("Produktpreis (€) z.B. 2.00 ");
 		preisInput.setPrefWidth(100);
 		
 		Label addlabel4 = new Label();
 		addlabel4.setText("Produktanzahl:");
 		//anzahl input
 		anzahlInput = new TextField();
-		anzahlInput.setPromptText("Produktplatz");
+		anzahlInput.setPromptText("Produktanzahl z.B. 2");
 		anzahlInput.setPrefWidth(100);
 		
 		
@@ -259,7 +286,7 @@ public class View extends Application {
 		addlabel5.setText("Produktgewicht (g):");
 		//Gewicht input
 		gewichtInput = new TextField();
-		gewichtInput.setPromptText("Produktgewicht (g)");
+		gewichtInput.setPromptText("Produktgewicht (g) z.B. 2");
 		gewichtInput.setPrefWidth(120);
 		
 		
@@ -267,8 +294,11 @@ public class View extends Application {
 		addlabel6.setText("Produktkategorie:");
 		//kategorie input
 		//get items from the kategorielist
+		System.out.println(Model.kategorieliste);
+		addChoiceBox.getItems().clear();
+		addChoiceBox.getItems().add("Kategorie wählen...");
 		addChoiceBox.getItems().addAll(Model.kategorieliste);
-		addChoiceBox.setValue(Model.kategorieliste.get(0));
+		addChoiceBox.setValue("Kategorie wählen...");
 		addChoiceBox.setMinWidth(200);
 
 		
@@ -328,9 +358,12 @@ public class View extends Application {
 		addwindow.show();
 	}
 	
+	/**
+	 * Mit dieser Methode wird das "Eintrag bearbeiten" Fenster erstellt. 
+	 * <br> Das Fenster zeigt die Daten des ausgewählten Produktes an. 
+	 * Hier kann der Benutzer beliebige Änderungen durchführen.
+	 */
 	public static void editwindow() {
-		
-		// Eintrag bearbeiten Fenster
 		
 		// Eine Liste 
 		ObservableList<Model> productSelected;
@@ -458,6 +491,10 @@ public class View extends Application {
 		editwindow.show();
 	}
 	
+	/**
+	 * Mit dieser Methode wird das "Kategorie bearbeiten" Fenster gestartet.
+	 * <br> Der Benutzer kann hier alle Kategorien einsehen, entfernen und neue hinzufügen.
+	 */
 	public static void editkatwindow() {
 		
 		//Kategorien Bearbeiten - Fenster
@@ -474,7 +511,6 @@ public class View extends Application {
 		
 		listView = new ListView<>();
 		listView.getItems().addAll(Model.kategorieliste);
-		listView.getItems().remove(0);
 		listView.setPrefHeight(150);
 		listView.getItems().sort(null);
 		
@@ -533,12 +569,15 @@ public class View extends Application {
 		editkatwindow.show();
 	}
 	
-
+	/**
+	 * Mit der main Methode wird das Hauptfenster gestartet und nach Beendigung des Programms die Model. writecsv() Methode aufgerufen.
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		Model.readcsv("penfactory.csv");
+		
 		launch(args);
 		Model.writecsv("penfactory.csv");
-		Controller.listePrinten(); //print the new student list
+//		Controller.listePrinten(); //print the new student list
 	}
 	
 }
