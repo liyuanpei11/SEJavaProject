@@ -27,15 +27,24 @@ import javafx.scene.control.ButtonBar.ButtonData;
  * @since 1.0
  *
  */
+
 public class Controller {
 	
 	public static ObservableList<Model> searchliste = FXCollections.observableArrayList();
 	
 	/**
 	 * Die Eingabe des Benutzers wird an die Model Class übergeben und in die objektliste eingefügt.
-	 * <br> Um die Korrektheit der Eingabe zu gewähren, übergibt die Methode alle Eingaben an die Methode checkInput().
-	 * Erst nach der Prüfung werden die Daten an die Model Class übergeben.
-	 * @param katChoiceBox ist die Auswahl der Kategorie des Nutzers.
+	 * <br> Es werden Mithilfe der checkalreadyexist() und checkplatzexist() Methoden überprüft, ob die Namen/Plätze bereits vergeben sind.
+	 * <br> Erst nach der erfolgreichen Überprüfungen werden die neuen Werte an die Daten übergeben.
+	 * <br> Am Ende werden die Daten in die CSV - Datei geschrieben um Datenverluste zu vermeiden.
+	 * 
+	 * @param katChoiceBox - Kategorie des neuen Produktes
+	 * @param neuName - Name des neuen Produktes
+	 * @param neuPlatz - Platz des neuen Produktes
+	 * @param neuPreis - Preis des neuen Produktes
+	 * @param neuAnzahl - Anzahl des neuen Produktes
+	 * @param neuGewicht - Gewicht des neuen Produktes
+	 * @param neuEigenschaft - Eigenschaften des neuen Produktes
 	 */
 	public static void saveButtonClicked(ChoiceBox<String> katChoiceBox, String neuName, int neuPlatz, BigDecimal neuPreis, int neuAnzahl, int neuGewicht, String neuEigenschaft) {
 		
@@ -63,20 +72,22 @@ public class Controller {
 			} catch (Exception e2) {
 				warnungFenster("Bitte überprüfen Sie Ihre Eingabe!");
 			}
-		}	
+		}
+		Model.writecsv("penfactory.csv");
 	} 
 	
 	/**
 	 * Hier wird die Eingabe des Benutzers auf Korrektheit und Kompatibilität geprüft. 
 	 * 
-	 * @param katChoiceBox - Die Auswahl der Kategorie des Benutzers.
-	 * @param checknameInput - Der eingegebene Produktname
-	 * @param checkplatzInput - Der eingegebene Produktplatz
-	 * @param checkpreisInput - Der eingegebene Produktpreis
-	 * @param checkanzahlInput - Die eingegebene Produktanzahl
-	 * @param checkgewichtInput - Das eingegebene Produktgewicht
-	 * @param checkeigenschaftenInput - Die eingegebene Produkteigenschaft
-	 * @return true - wenn die Eingabe Korrekt war
+	 * @param checknameInput - der eingebene Produktname
+	 * @param checkplatzInput - der eingegebene Produktplatz
+	 * @param checkpreisInput - der eingegebene Produktpreis
+	 * @param checkanzahlInput - die eingegebene Produktanzahl
+	 * @param checkgewichtInput - das eingegebene Produktgewicht
+	 * @param checkeigenschaftenInput - die eingebenen Produkteigenschaft
+	 * 
+	 * @return true - wenn die Eingabe korrekt war
+	 * 
 	 */
 	public static boolean checkInput(TextField checknameInput, TextField checkplatzInput, TextField checkpreisInput, TextField checkanzahlInput, TextField checkgewichtInput, TextField checkeigenschaftenInput ) {
 		if(checknameInput.getText().isEmpty()){ 
@@ -118,77 +129,28 @@ public class Controller {
 			return true;
 		}
 	}
-	
-//	public static boolean checkInput(ChoiceBox<String> katChoiceBox, TextField checknameInput, TextField checkplatzInput, TextField checkpreisInput, TextField checkanzahlInput, TextField checkgewichtInput, TextField checkeigenschaftenInput ) {
-//		String kategorie = katChoiceBox.getValue();
-//		if(checknameInput.getText().isEmpty()){ 
-//			warnungFenster("Bitte geben Sie einen Produktnamen ein!");
-//			return false;
-//		} else 
-//			if (checkalreadyexist(checknameInput.getText(), 0)) {
-//				warnungFenster("Ein Produkt mit diesem Namen existiert bereits!");
-//				return false;
-//		} else
-//			if (!checknameInput.getText().matches("[A-Za-z0-9\\s]+$")) { 
-//				warnungFenster("Ein Produktname darf nur Buchstaben und Zahlen enthalten!");
-//				return false;
-//		} else
-//			if(checkplatzInput.getText().isEmpty() || !checkplatzInput.getText().matches("\\d+")){
-//				warnungFenster("Bitte überprüfen Sie die Eingabe des Produktplatzes!");
-//				return false;
-//		} else 
-//			if (checkplatzexist(Integer.parseInt(checkplatzInput.getText()))) {
-//				warnungFenster("Dieser Produktplatz ist bereits von einem anderen Produkt belegt!");
-//				return false;
-//		} else 
-//			if (Integer.parseInt(checkplatzInput.getText()) <= 0) {
-//				warnungFenster("Der Produktplatz muss größer als 0 sein!");
-//				return false;
-//		} else 
-//			if(checkpreisInput.getText().isEmpty()){
-//				warnungFenster("Bitte geben Sie einen Produktpreis ein!");
-//				return false;
-//		} else 
-//			if (!checkpreisInput.getText().matches("(\\d+).(\\d{2,})")) {
-//				warnungFenster("Bitte übeprüfen Sie Ihre Eingabe bezüglich des Preises! z.B. 2.00");
-//				return false;
-//		} else 
-//			if(checkanzahlInput.getText().isEmpty() ||!checkanzahlInput.getText().matches("\\d+") || Integer.parseInt(checkanzahlInput.getText()) <= 0){
-//				warnungFenster("Bitte überprüfen Sie Ihre Eingabe bezüglich der Anzahl! z.B. 2");
-//				return false;
-//		} else 
-//			if(checkgewichtInput.getText().isEmpty() ||!checkgewichtInput.getText().matches("\\d+")){
-//				warnungFenster("Bitte überprüfen Sie die Eingabe des Produkgewichtes! z.B. 2");
-//				return false;
-//		} else 
-//			if (kategorie == "Kategorie wählen...") {
-//				warnungFenster("Bitte wählen Sie eine Produktkategorie aus!");
-//				return false;
-//		} else 
-//			if(checkeigenschaftenInput.getText().isEmpty() || checkeigenschaftenInput.getText().contains(";")){
-//				warnungFenster("Bitte überprüfen Sie die Eingabe der Produkteigenschaft! Es darf kein Semikolon (;) verwendet werden!");
-//				return false;
-//		} else  {
-//			return true;
-//		}
-//	}
-	
+		
 	/**
 	 * Die Änderung der Produktdaten werden an die Model Class übergeben.
-	 * <br> Um die Korrektheit der Eingabe zu gewährleisten, wird die Eingabe an die Methode checkInput() übergeben und überprüft.
-	 * Erst nach der Überprüfung werden die neuen Daten an die Model Class übergeben.
+	 * <br> Es werden Mithilfe der checkalreadyexist() und checkplatzexist() Methoden überprüft, ob die Namen/Plätze bereits vergeben sind.
+	 * <br> Erst nach der erfolgreichen Überprüfungen werden die neuen Werte an die Daten übergeben.
+	 * <br> Am Ende werden die Daten in die CSV - Datei geschrieben um Datenverluste zu vermeiden.
 	 * 
 	 * @param productSelected - das ausgewählte Produkt aus der Tabelle
 	 * @param alteAnzahl - die alte Produktanzahl
 	 * @param editkatChoiceBox - die ausgewählte Kategorie 
-	 * @param editgetName - der alte Name
-	 * @param editgetPlatz - der alte Platz
+	 * @param editgetselectedName - der alte Name
+	 * @param editgetselectedPlatz - der alte Platz
+	 * @param editName - der eingegebene Produktname
+	 * @param editPlatz - der eingegebene Produktplatz
+	 * @param editPreis - der eingegebene Produktpreis
+	 * @param editAnzahl - die eingegebene Produktanzahl
+	 * @param editGewicht - das eingegebene Produktgewicht
+	 * @param editEigenschaft - die eingegebenen Produkteigenschaft
+	 * 
 	 */
 	public static void editsaveButtonClicked(ObservableList<Model> productSelected, int alteAnzahl, ChoiceBox<String> editkatChoiceBox, String editgetselectedName, int editgetselectedPlatz, String editName, int editPlatz, BigDecimal editPreis, int editAnzahl,  int editGewicht, String editEigenschaft) {
 		int neueAnzahl = alteAnzahl + editAnzahl;
-//		String neuerName = editName;
-//		int neuerPlatz = Integer.parseInt(View.editplatzInput.getText());
-		
 		if (checkalreadyexist(editName, 0) && !editName.equals(editgetselectedName)) {
 				warnungFenster("Ein Produkt mit diesem Namen existiert bereits!");
 		} else 
@@ -216,18 +178,29 @@ public class Controller {
 					warnungFenster("Bitte überprüfen Sie Ihre Eingabe!");
 				}
 			}
+		Model.writecsv("penfactory.csv");
 		}
 	
 	/**
-	 *  Das ausgewählte Produkt wird komplett aus dem Datensatz entfernt.
+	 * Das ausgewählte Produkt wird aus dem Datensatz entfernt.
+	 * <br> Am Ende werden die Daten in die CSV - Datei geschrieben um Datenverluste zu vermeiden.
+	 * 
+	 * @param allProducts - Liste mit allen Produkten
+	 * @param productSelected - Liste mit dem ausgewählten produkt
+	 * 
 	 */
 	public static void deleteButtonClicked(ObservableList<Model> allProducts, ObservableList<Model> productSelected) {
 		productSelected.forEach(allProducts::remove);
+		Model.writecsv("penfactory.csv");
 	}
 	
 	/**
 	 * Mit dieser Methode wird überprüft, ob der Benutzer ein Element aus der Tabelle ausgewählt hat.
+	 * 
+	 * @param checkSelected - das vom User ausgewählte Element
+	 * 
 	 * @return true - wenn eine Element ausgewählt wurde.
+	 * 
 	 */
 	public static boolean checkselect(ObservableList<Model> checkSelected) {
 		if (checkSelected.isEmpty()) {
@@ -239,8 +212,10 @@ public class Controller {
 	
 	/**
 	 * Diese Methode überprüft, ob eine Element aus der Listenansicht der Kategorie ausgewählt wurde.
-	 * <br> Falls kein Element ausgewählt wurde, erscheint eine Fehlermeldung.
-	 * <br> Falls ein Element ausgewählt wurde, wird die Methode editkatdelButtonClicked() aufgerufen.
+	 * 
+	 * @param checkSelected - ausgewählte Kategorie die zu Prüfen gilt
+	 * 
+	 * @return true - wenn ein Element aus der Liste ausgewählt wurde
 	 */
 	public static boolean checkselectkat(String checkSelected) {
 		if (!checkSelected.isEmpty()) {
@@ -254,11 +229,12 @@ public class Controller {
 	/**
 	 * Diese Methode löscht die ausgewählte Kategorie aus der kategorieliste.
 	 * <br> Hier wird überprüft, ob die ausgewählte Kategorie noch Produkte enthält. 
-	 * Falls ja, kann diese Kategorie nicht gelöscht werden.
+	 * <br>Falls ja, kann diese Kategorie nicht gelöscht werden.
+	 * <br>Zu letzt wird die Liste nochmal aktualisiert und die Daten in die CSV - Datei geschrieben um Datenverluste zu vermeiden.
+	 * 
+	 * @param delkat - die zu Löschende Kategorie
 	 */
 	public static void editkatdelButtonClicked(String delkat) {
-//		String delkat = View.listView.getSelectionModel().getSelectedItem();
-//		
 		if (checkalreadyexist(delkat, 1)) {
 			warnungFenster("Mindestens ein Produkt ist noch in dieser Kategorie!");
 		} else {
@@ -267,13 +243,18 @@ public class Controller {
 			View.listView.getItems().addAll(Model.kategorieliste);
 			View.listView.getItems().remove(0);
 		}
+		Model.writecsv("penfactory.csv");
 	}
 	
 	/**
 	 * Mit dieser Abfrage wird überprüft, ob der Name oder der Platz bereits belegt ist.
+	 * 
 	 * @param check - die zu prüfende Eingabe
+	 * 
 	 * @param objekt_id_id - die ID der Eigenschaft des Produktes
+	 * 
 	 * @return true - wenn der Name oder Platz bereits vergeben ist
+	 * 
 	 */
 	public static boolean checkalreadyexist(String check, int objekt_id_id) {
 		ObservableList<String> checkliste = FXCollections.observableArrayList();
@@ -297,8 +278,11 @@ public class Controller {
 	
 	/**
 	 * Mit dieser Abfrage wird überprüft, ob der Platz bereits belegt ist.
+	 * 
 	 * @param check - der zu prüfende Platz
+	 * 
 	 * @return true - wenn der Platz bereits belegt ist
+	 * 
 	 */
 	public static boolean checkplatzexist(int check) {
 		ObservableList<Integer> checkliste = FXCollections.observableArrayList();
@@ -314,24 +298,31 @@ public class Controller {
 			
 	/**
 	 * Die eingegebene Kategorie wird in die kategorieliste hinzugefügt, wenn diese nicht bereits vorhanden ist.
+	 * <br> Am Ende der Methode wird die Listenanzeige aktualisiert und die Daten in die CSV - Datei geschrieben um Datenverluste zu vermeiden.
+	 * 
+	 * @param katadd - die eingegebene neue Kategorie
+	 * 
 	 */
 	public static void editkataddButtonClicked(String katadd) {
-//		String katadd = View.editkatInput.getText();
 		if (katadd.isEmpty()) {
 			warnungFenster("Bitte überprüfen Sie Ihre Eingabe!");
 		} else if(Model.checkkategorieliste(katadd)){
 			warnungFenster("Diese Kategorie existiert bereits!");
 		}else {
 			Model.kategorieliste.add(katadd);
-			View.editkatInput.clear(); //Textfeld zum Ausgangspunkt zurücksetzen
+			View.editkatInput.clear(); 									//Textfeld zum Ausgangspunkt zurücksetzen
 			View.listView.getItems().clear();
 			View.listView.getItems().addAll(Model.kategorieliste);
 		}
+		Model.writecsv("penfactory.csv");
 	}
 	
 	/**
 	 * Es wird bei dieser Methode das "Kategorie bearbeiten" Fenster geschlossen.
 	 * <br> Der Benutzer wird darauf hingewiesen, wenn noch eine Eingabe nicht abgeschlossen ist und gefragt, ob das Fenster geschlossen werden soll.
+	 * 
+	 * @param editkattext - Der Text der im Textfeld des "Kategorie bearbeiten" Fensters steht
+	 * 
 	 */
 	public static void editkatabortButtonClicked(String editkattext) {
 		if (editkattext.isEmpty()) {
@@ -345,7 +336,9 @@ public class Controller {
 	
 	/**
 	 * Mit dieser Funktion wird eine Warnung erzeugt und der Benutzer auf ein Problem hingewiesen.
+	 * 
 	 * @param warntext - Der Hinweis, was die Fehlerursache ist
+	 * 
 	 */
 	public static void warnungFenster(String warntext) {
 		Alert alert = new Alert(AlertType.WARNING);
@@ -357,7 +350,9 @@ public class Controller {
 	
 	/**
 	 * Der Benutzer wird gefragt, ob er sich sicher ist, dass er das Programm schließen will.
+	 * 
 	 * @return true - wenn der Benutzer das Fenster schließen will.
+	 * 
 	 */
 	public static boolean confirmclosewindow() {
 
@@ -381,7 +376,9 @@ public class Controller {
 	
 	/**
 	 * Der Benutzer wird gefragt, ob er das ausgewählte Element löschen will.
+	 * 
 	 * @return true - der Benutzer hat das Löschen bestätigt
+	 * 
 	 */
 	public static boolean confirmdeletewindow() {
 
@@ -405,7 +402,9 @@ public class Controller {
 	
 	/**
 	 * Der Benutzer wird gefragt, ob er das Fenster ohne Speichern Schließen will.
+	 * 
 	 * @return true - der Benutzer hat das schließen ohne Speichern bestätigt
+	 * 
 	 */
 	public static boolean confirmabortwindow() {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -428,7 +427,10 @@ public class Controller {
 	
 	/**
 	 * In der Methode werden die Daten nach der Eingabe des Benutzers in der Sucheliste durchsucht und dargestellt.
+	 * 
 	 * @param mainChoiceBox - die Auswahl des Benutzers, in welcher Spalte er die Tabelle durchsuchen will
+	 * @param searchtext - der Suchtext mit dem die Daten durchsucht werden sollen
+	 * 
 	 */
 	public static void searchButtonClicked(ChoiceBox<String> mainChoiceBox, String searchtext) {
 		searchliste.clear();
@@ -531,22 +533,24 @@ public class Controller {
 		if (searchliste.isEmpty() && !searchtext.isEmpty()) {
 			warnungFenster("Es konnte kein Ergebnis zu dieser Suche gefunden werden!");
 		} else if (!searchliste.isEmpty()){
-//			System.out.println(searchliste);
 			View.table.setItems(searchliste);
 		}
 	}
 	
 	/**
 	 * Diese Methode setzt die Suchleiste zurück und zeigt wieder alle Daten in der Tabelle an.
+	 * 
 	 */
 	public static void resetButtonClicked() {
-		View.SearchInput.clear(); //Suchleiste zurücksetzen
+		View.SearchInput.clear(); 				//Suchleiste zurücksetzen
 		View.table.setItems(Model.objektliste);
 	}
 	
 	/**
 	 * Hier überprüft das Programm, ob noch Fenster offen sind.
+	 * 
 	 * @return true - wenn andere Fenster außer dem Hauptfenster noch offen sind
+	 * 
 	 */
 	public static boolean checkopenwindow() {
 		if (!View.addwindow.isShowing() && !View.editwindow.isShowing() && !View.editkatwindow.isShowing()) {
@@ -559,6 +563,7 @@ public class Controller {
 	
 	/**
 	 * Diese Methode dient zur zwischenzeitigen Konsolen ausgebe der aktuellen objekteliste.
+	 * 
 	 */
 	public static void listePrinten() {
 		for (Model o: Model.objektliste) {
@@ -572,6 +577,5 @@ public class Controller {
 								" Eigenschaften: " +o.getEigenschaften()+ "\n");
 		}
 	}
-
 
 }

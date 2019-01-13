@@ -27,9 +27,9 @@ import javafx.stage.Stage;
 /**
  * Die Class View ist nur für die visuelle Darstellung des Programms zuständig.
  * <br> Um alle nötigen Funktionen von JavaFX nutzen zu können, muss man die Class View um die JavaFx Class Application erweitern.
- * Hier werden alle Fenster, Textfelder und Knöpfe im vorhinein festgelegt. 
- * Die Daten für die Tabellen oder Textfelder bezieht die View Class direkt von der Model Class.
- * Alle anderen aktiven Bedienungen des Benutzers werden an die Controller Class übergeben und dort weiter verarbeitet.
+ * <br>Hier werden alle Fenster, Textfelder und Knöpfe im vorhinein festgelegt. 
+ * <br>Die Daten für die Tabellen oder Textfelder bezieht die View Class direkt von der Model Class.
+ * <br>Alle anderen aktiven Bedienungen des Benutzers werden an die Controller Class übergeben und dort weiter verarbeitet.
  * 
  * @author Didem Güngör 	(Mat-Nr. 772703)
  * @author Wisal Elzakzouk	(Mat-Nr. 782102)
@@ -40,6 +40,8 @@ import javafx.stage.Stage;
  * @since 1.0
  * 
  */
+
+
 public class View extends Application {
 	
 	//Hauptfenster
@@ -59,7 +61,6 @@ public class View extends Application {
 	static TextField kategorieInput;
 	static TextField eigenschaftenInput;
 	
-	
 	//"Element bearbeiten" - Fenster
 	public static Stage editwindow = new Stage();
 	static TextField editnameInput;
@@ -71,21 +72,22 @@ public class View extends Application {
 	static TextField editeigenschaftenInput;
 	public static ChoiceBox<String> editkatChoiceBox = new ChoiceBox<>();
 	
-	//"Kategorien bearbeiten Fenster
+	//"Kategorien bearbeiten" Fenster
 	public static Stage editkatwindow = new Stage();
 	static ListView<String> listView;
 	static TextField editkatInput;
 	static TableView<String> editkattable;
-	
-	@SuppressWarnings("unchecked")
-	@Override
+
 	
 	/**
 	 * In dieser Methode wird das Hauptfenster initialisert. 
 	 * <br> Das Hauptfenster verbindet alle grafischen Fenster miteinander, welche über Buttons aufgerufen werden können.
-	 * Hier werden die Daten aus der Datenbank mithilfe der Tabelle dargestellt.
-	 * Desweiteren kann man eine Suche nach beliebiger Eingabe starten.
+	 * <br>Hier werden die Daten aus der Datenbank mithilfe der Tabelle dargestellt.
+	 * <br>Desweiteren kann man eine Suche nach beliebiger Eingabe starten.
+	 * <br> (at)SuppressWarnings("unchecked") dient dazu dar, um eine Warnung von Java zu unterdrücken, welche jedoch keinen Einfluss auf das Programm hat.
+	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	public void start(Stage primaryStage) {
 		Model.readcsv("penfactory.csv");
 		try {
@@ -178,7 +180,6 @@ public class View extends Application {
 					productSelected = table.getSelectionModel().getSelectedItems();
 					Controller.deleteButtonClicked(allProducts, productSelected);
 				}
-				
 			});
 			
 			// Beenden - Knopf
@@ -192,7 +193,15 @@ public class View extends Application {
 			//set up table
 			table = new TableView<>();
 			table.setItems(Model.objektliste);
-			table.getColumns().addAll(nameColumn,platzColumn,preisColumn,anzahlColumn,gewichtColumn,gesamtgewichtColumn,kategorieColumn,eigenschaftenColumn);
+			table.getColumns().addAll(						
+									nameColumn,
+									platzColumn,
+									preisColumn,
+									anzahlColumn,
+									gewichtColumn,
+									gesamtgewichtColumn,
+									kategorieColumn,
+									eigenschaftenColumn); 	
 			
 			mainChoiceBox.getItems().addAll("Name", "Platz", "Preis", "Anzahl", "Gewicht", "Kategorie", "Eigenschaften");
 			mainChoiceBox.setValue("Name");
@@ -222,7 +231,7 @@ public class View extends Application {
 			hBox3.setAlignment(Pos. CENTER_LEFT);
 			HBox.setHgrow(hBox3, Priority.ALWAYS);
 			
-			// Virtuelle Box wo hBox 2 und hBox 3 neben einander dargestellt werden, um eine geordnet Ansicht zu erreichen
+			// Virtuelle Box um eine geordnet Ansicht zu erreichen
 			HBox hBox1 = new HBox();
 			hBox1.setPadding(new Insets(10,10,0,10)); //rand um die HBox
 			hBox1.setSpacing(10); //Platz zwischen den Elementen
@@ -386,7 +395,7 @@ public class View extends Application {
 	/**
 	 * Mit dieser Methode wird das "Eintrag bearbeiten" Fenster erstellt. 
 	 * <br> Das Fenster zeigt die Daten des ausgewählten Produktes an. 
-	 * Hier kann der Benutzer beliebige Änderungen durchführen.
+	 * <br>Hier kann der Benutzer beliebige Änderungen durchführen.
 	 */
 	public static void editwindow() {
 		
@@ -619,14 +628,13 @@ public class View extends Application {
 	}
 	
 	/**
-	 * Mit der main Methode wird das Hauptfenster gestartet und nach Beendigung des Programms die Model. writecsv() Methode aufgerufen.
-	 * @param args
+	 * Mit der main Methode wird das Hauptfenster gestartet und nach Beendigung des Programms die Model.writecsv() Methode aufgerufen.
+	 * @param args - command - line Argumente die an das Programm übergeben werden.
 	 */
 	public static void main(String[] args) {
 		
 		launch(args);
 		Model.writecsv("penfactory.csv");
-//		Controller.listePrinten(); //print the new student list
 	}
 	
 }

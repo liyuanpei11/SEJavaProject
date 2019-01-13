@@ -246,7 +246,14 @@ public class Model {
 	 *  @return Gibt alle Paramter eines Produktes in einer Zeile aus. 
 	 */
 	public String toString() {
-		return "Objekt [Name=" + name +", platz=" + platz + ", Preis=" + preis +", Anzahl=" + anzahl + ", Gewicht=" + gewicht + ", Gesamtgewicht=" + gesamtgewicht + ", Kategorie=" + kategorie + ", Eigenschaften=" + eigenschaften +"]";
+		return "Objekt [Name=" + name +
+				", platz=" + platz + 
+				", Preis=" + preis +
+				", Anzahl=" + anzahl + 
+				", Gewicht=" + gewicht + 
+				", Gesamtgewicht=" + gesamtgewicht + 
+				", Kategorie=" + kategorie + 
+				", Eigenschaften=" + eigenschaften +"]";
 	}
 		
 	/**
@@ -289,7 +296,7 @@ public class Model {
 											new BigDecimal(tokens[objekt_preis_id]), 
 											Integer.parseInt(tokens[objekt_anzahl_id]),
 											Integer.parseInt(tokens[objekt_gewicht_id]),
-											0,
+											0, 												// Die 0 dient lediglich als Platzhalter in diesem Moment. 
 											tokens[objekt_kategorie_id], 
 											tokens[objekt_eigenschaften_id]));
 					}
@@ -300,21 +307,21 @@ public class Model {
 		} catch (Exception e) {
 			if (e.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
 				System.out.println("Array Error");
-				Controller.warnungFenster("Fehlerhafte Datei! Bitte überprüfen Sie, ob in der Datei ein Semikolon (;) fehlt.");
+				Controller.warnungFenster("Fehlerhafte Datei! Bitte überprüfen Sie, ob in der Datenbank - Datei ein Semikolon (;) fehlt.");
 			} else 
 				if (e.toString().contains("java.io.FileNotFoundException")) {
 					System.out.println("File Not Found Error");
-					Controller.warnungFenster("Die Datei konnte nicht gefunden werden! Bitte legen sie Datenbankdatei in den selben Ordner wie das Programm!");
+					Controller.warnungFenster("Die Datei konnte nicht gefunden werden! Bitte legen Sie die Datenbankdatei in den selben Ordner wie das Programm oder Sie erstellen die Datenbank mit diesem Programm!");
 				}
 			System.out.println("Error in CsvFileReader !!!");
 		}
-		
-		
 	}
 	
 	/**
 	 * Überprüft ob die Kategorie bereits in der Liste vorhanden ist.
+	 * 
 	 * @param search gibt die zu Überprüfende Kategorie an.
+	 * 
 	 * @return true - wenn die Kategorie bereits vorhanden ist.
 	 */
 	public static boolean checkkategorieliste(String search) {
@@ -330,6 +337,7 @@ public class Model {
 	 * Sichert die Daten in einer CSV - Datei.
 	 * <br> Alle Objekte aus der objekteliste in die Datei geschrieben.
 	 * <br> Alle Kategorien werden mit einer besonderen Kennzeichnung in die Datei geschrieben.
+	 * 
 	 * @param filename gibt den Namen der CSV - Datei an.
 	 */
 	public static void writecsv(String filename){
@@ -384,7 +392,6 @@ public class Model {
 					
 			System.out.println("Csv Datei wurde erfolgreich geschrieben!!!");
 			
-					
 		} catch (Exception e) {
 			System.out.println("Error in CsvFileWriter!!!");
 			e.printStackTrace();
