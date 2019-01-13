@@ -37,26 +37,34 @@ public class Controller {
 	 * Erst nach der Prüfung werden die Daten an die Model Class übergeben.
 	 * @param katChoiceBox ist die Auswahl der Kategorie des Nutzers.
 	 */
-	public static void saveButtonClicked(ChoiceBox<String> katChoiceBox) {
+	public static void saveButtonClicked(ChoiceBox<String> katChoiceBox, String neuName, int neuPlatz, BigDecimal neuPreis, int neuAnzahl, int neuGewicht, String neuEigenschaft) {
+		
 		String kategorie = katChoiceBox.getValue();
-			// Überprüfung der Eingabe, ob die Eingabe leer ist bzw. nicht erlaubte Zeichen enthält
-		if (checkInput(katChoiceBox, View.nameInput, View.platzInput, View.preisInput, View.anzahlInput, View.gewichtInput, View.eigenschaftenInput)) {
+		
+		if (checkalreadyexist(neuName, 0)) {
+			warnungFenster("Ein Produkt mit diesem Namen existiert bereits!");
+		} else if (checkplatzexist(neuPlatz)) {
+			warnungFenster("Dieser Produktplatz ist bereits von einem anderen Produkt belegt!");
+		} else {
 			try {
 				Model.objektliste.add(new Model(
-						View.nameInput.getText(), 
-						Integer.parseInt(View.platzInput.getText()), 
-						new BigDecimal(View.preisInput.getText()), 
-						Integer.parseInt(View.anzahlInput.getText()),
-						Integer.parseInt(View.gewichtInput.getText()),
-						Integer.parseInt("0"),
+						neuName, 
+						neuPlatz, 
+						neuPreis, 
+						neuAnzahl,
+						neuGewicht,
+						0,
 						kategorie, 
-						View.eigenschaftenInput.getText()));
+						neuEigenschaft));
+				if(neuAnzahl < 10) {
+					warnungFenster("Achtung, die Anzahl beträgt weniger als 10!");
+				}
 				View.addwindow.close();
 			} catch (Exception e2) {
 				warnungFenster("Bitte überprüfen Sie Ihre Eingabe!");
 			}
-			}
-		} 
+		}	
+	} 
 	
 	/**
 	 * Hier wird die Eingabe des Benutzers auf Korrektheit und Kompatibilität geprüft. 
@@ -70,26 +78,17 @@ public class Controller {
 	 * @param checkeigenschaftenInput - Die eingegebene Produkteigenschaft
 	 * @return true - wenn die Eingabe Korrekt war
 	 */
-	public static boolean checkInput(ChoiceBox<String> katChoiceBox, TextField checknameInput, TextField checkplatzInput, TextField checkpreisInput, TextField checkanzahlInput, TextField checkgewichtInput, TextField checkeigenschaftenInput ) {
-		String kategorie = katChoiceBox.getValue();
+	public static boolean checkInput(TextField checknameInput, TextField checkplatzInput, TextField checkpreisInput, TextField checkanzahlInput, TextField checkgewichtInput, TextField checkeigenschaftenInput ) {
 		if(checknameInput.getText().isEmpty()){ 
 			warnungFenster("Bitte geben Sie einen Produktnamen ein!");
 			return false;
 		} else 
-			if (checkalreadyexist(checknameInput.getText(), 0)) {
-				warnungFenster("Ein Produkt mit diesem Namen existiert bereits!");
-				return false;
-		} else
 			if (!checknameInput.getText().matches("[A-Za-z0-9\\s]+$")) { 
 				warnungFenster("Ein Produktname darf nur Buchstaben und Zahlen enthalten!");
 				return false;
 		} else
 			if(checkplatzInput.getText().isEmpty() || !checkplatzInput.getText().matches("\\d+")){
-				warnungFenster("Bitte überprüfen Sie die Eingabe des Produktplatzes!");
-				return false;
-		} else 
-			if (checkplatzexist(Integer.parseInt(checkplatzInput.getText()))) {
-				warnungFenster("Dieser Produktplatz ist bereits von einem anderen Produkt belegt!");
+				warnungFenster("Bitte überprüfen Sie die Eingabe des Produktplatzes! z.B. 2");
 				return false;
 		} else 
 			if (Integer.parseInt(checkplatzInput.getText()) <= 0) {
@@ -104,16 +103,12 @@ public class Controller {
 				warnungFenster("Bitte übeprüfen Sie Ihre Eingabe bezüglich des Preises! z.B. 2.00");
 				return false;
 		} else 
-			if(checkanzahlInput.getText().isEmpty() ||!checkanzahlInput.getText().matches("\\d+") || Integer.parseInt(checkanzahlInput.getText()) <= 0){
+			if(checkanzahlInput.getText().isEmpty() || !checkanzahlInput.getText().matches("\\d+") || Integer.parseInt(checkanzahlInput.getText()) <= 0){
 				warnungFenster("Bitte überprüfen Sie Ihre Eingabe bezüglich der Anzahl! z.B. 2");
 				return false;
 		} else 
-			if(checkgewichtInput.getText().isEmpty() ||!checkgewichtInput.getText().matches("\\d+")){
+			if(checkgewichtInput.getText().isEmpty() || !checkgewichtInput.getText().matches("\\d+") || Integer.parseInt(checkgewichtInput.getText()) <= 0){
 				warnungFenster("Bitte überprüfen Sie die Eingabe des Produkgewichtes! z.B. 2");
-				return false;
-		} else 
-			if (kategorie == "Kategorie wählen...") {
-				warnungFenster("Bitte wählen Sie eine Produktkategorie aus!");
 				return false;
 		} else 
 			if(checkeigenschaftenInput.getText().isEmpty() || checkeigenschaftenInput.getText().contains(";")){
@@ -123,6 +118,60 @@ public class Controller {
 			return true;
 		}
 	}
+	
+//	public static boolean checkInput(ChoiceBox<String> katChoiceBox, TextField checknameInput, TextField checkplatzInput, TextField checkpreisInput, TextField checkanzahlInput, TextField checkgewichtInput, TextField checkeigenschaftenInput ) {
+//		String kategorie = katChoiceBox.getValue();
+//		if(checknameInput.getText().isEmpty()){ 
+//			warnungFenster("Bitte geben Sie einen Produktnamen ein!");
+//			return false;
+//		} else 
+//			if (checkalreadyexist(checknameInput.getText(), 0)) {
+//				warnungFenster("Ein Produkt mit diesem Namen existiert bereits!");
+//				return false;
+//		} else
+//			if (!checknameInput.getText().matches("[A-Za-z0-9\\s]+$")) { 
+//				warnungFenster("Ein Produktname darf nur Buchstaben und Zahlen enthalten!");
+//				return false;
+//		} else
+//			if(checkplatzInput.getText().isEmpty() || !checkplatzInput.getText().matches("\\d+")){
+//				warnungFenster("Bitte überprüfen Sie die Eingabe des Produktplatzes!");
+//				return false;
+//		} else 
+//			if (checkplatzexist(Integer.parseInt(checkplatzInput.getText()))) {
+//				warnungFenster("Dieser Produktplatz ist bereits von einem anderen Produkt belegt!");
+//				return false;
+//		} else 
+//			if (Integer.parseInt(checkplatzInput.getText()) <= 0) {
+//				warnungFenster("Der Produktplatz muss größer als 0 sein!");
+//				return false;
+//		} else 
+//			if(checkpreisInput.getText().isEmpty()){
+//				warnungFenster("Bitte geben Sie einen Produktpreis ein!");
+//				return false;
+//		} else 
+//			if (!checkpreisInput.getText().matches("(\\d+).(\\d{2,})")) {
+//				warnungFenster("Bitte übeprüfen Sie Ihre Eingabe bezüglich des Preises! z.B. 2.00");
+//				return false;
+//		} else 
+//			if(checkanzahlInput.getText().isEmpty() ||!checkanzahlInput.getText().matches("\\d+") || Integer.parseInt(checkanzahlInput.getText()) <= 0){
+//				warnungFenster("Bitte überprüfen Sie Ihre Eingabe bezüglich der Anzahl! z.B. 2");
+//				return false;
+//		} else 
+//			if(checkgewichtInput.getText().isEmpty() ||!checkgewichtInput.getText().matches("\\d+")){
+//				warnungFenster("Bitte überprüfen Sie die Eingabe des Produkgewichtes! z.B. 2");
+//				return false;
+//		} else 
+//			if (kategorie == "Kategorie wählen...") {
+//				warnungFenster("Bitte wählen Sie eine Produktkategorie aus!");
+//				return false;
+//		} else 
+//			if(checkeigenschaftenInput.getText().isEmpty() || checkeigenschaftenInput.getText().contains(";")){
+//				warnungFenster("Bitte überprüfen Sie die Eingabe der Produkteigenschaft! Es darf kein Semikolon (;) verwendet werden!");
+//				return false;
+//		} else  {
+//			return true;
+//		}
+//	}
 	
 	/**
 	 * Die Änderung der Produktdaten werden an die Model Class übergeben.
@@ -135,33 +184,32 @@ public class Controller {
 	 * @param editgetName - der alte Name
 	 * @param editgetPlatz - der alte Platz
 	 */
-	public static void editsaveButtonClicked(ObservableList<Model> productSelected, int alteAnzahl, ChoiceBox<String> editkatChoiceBox, String editgetName, int editgetPlatz) {
-		int neueAnzahl = alteAnzahl + Integer.parseInt(View.editanzahlInput.getText());
-		String neuerName = View.editnameInput.getText();
-		int neuerPlatz = Integer.parseInt(View.editplatzInput.getText());
+	public static void editsaveButtonClicked(ObservableList<Model> productSelected, int alteAnzahl, ChoiceBox<String> editkatChoiceBox, String editgetselectedName, int editgetselectedPlatz, String editName, int editPlatz, BigDecimal editPreis, int editAnzahl,  int editGewicht, String editEigenschaft) {
+		int neueAnzahl = alteAnzahl + editAnzahl;
+//		String neuerName = editName;
+//		int neuerPlatz = Integer.parseInt(View.editplatzInput.getText());
 		
-		if (checkalreadyexist(neuerName, 0) && !neuerName.equals(editgetName)) {
+		if (checkalreadyexist(editName, 0) && !editName.equals(editgetselectedName)) {
 				warnungFenster("Ein Produkt mit diesem Namen existiert bereits!");
 		} else 
-			if (checkplatzexist(neuerPlatz) && neuerPlatz != editgetPlatz) {
+			if (checkplatzexist(editPlatz) && editPlatz != editgetselectedPlatz) {
 				warnungFenster("Dieser Produktplatz ist bereits von einem anderen Produkt belegt!");
 		} else 
 			if (neueAnzahl < 0) {
 				warnungFenster("Bitte übeprüfen Sie Ihre Eingabe bezüglich der geänderten Anzahl!");
-		} else 
-			if (checkInput(editkatChoiceBox, View.editnameInput, View.editplatzInput, View.editpreisInput, 1, View.editgewichtInput, View.editeigenschaftenInput)) {
+		} else {
 				try {
 					String kategorie = editkatChoiceBox.getValue();
-					productSelected.get(0).setName(View.editnameInput.getText());
-					productSelected.get(0).setPlatz(Integer.parseInt(View.editplatzInput.getText()));
-					productSelected.get(0).setPreis(new BigDecimal(View.editpreisInput.getText()));
+					productSelected.get(0).setName(editName);
+					productSelected.get(0).setPlatz(editPlatz);
+					productSelected.get(0).setPreis(editPreis);
 					if (neueAnzahl < 10) {
 						warnungFenster("Die Produktanzahl beträgt nur noch " + neueAnzahl +"!");
 					}
 					productSelected.get(0).setAnzahl(neueAnzahl);
-					productSelected.get(0).setGewicht(Integer.parseInt(View.editgewichtInput.getText()));
+					productSelected.get(0).setGewicht(editGewicht);
 					productSelected.get(0).setKategorie(kategorie);
-					productSelected.get(0).setEigenschaften(View.editeigenschaftenInput.getText());
+					productSelected.get(0).setEigenschaften(editEigenschaft);
 					View.editwindow.close();
 					View.table.refresh();
 				} catch (Exception e) {
@@ -173,32 +221,15 @@ public class Controller {
 	/**
 	 *  Das ausgewählte Produkt wird komplett aus dem Datensatz entfernt.
 	 */
-	public static void deleteButtonClicked() {
-		ObservableList<Model> productSelected, allProducts;
-		allProducts = View.table.getItems();
-		productSelected = View.table.getSelectionModel().getSelectedItems();
+	public static void deleteButtonClicked(ObservableList<Model> allProducts, ObservableList<Model> productSelected) {
 		productSelected.forEach(allProducts::remove);
 	}
-	
-
-//	public static int checkdecimaldigits(BigDecimal bdToCheck) {
-//		final String s = bdToCheck.toPlainString();
-//	    final int index = s.indexOf('.');
-//	    if (index < 0) {
-//	        return 0;
-//	    } else {
-//	    	return s.length() - 1 - index;
-//	    }
-//	}
 	
 	/**
 	 * Mit dieser Methode wird überprüft, ob der Benutzer ein Element aus der Tabelle ausgewählt hat.
 	 * @return true - wenn eine Element ausgewählt wurde.
 	 */
-	public static boolean checkselect() {
-		ObservableList<Model> checkSelected;
-		checkSelected = View.table.getSelectionModel().getSelectedItems();
-		
+	public static boolean checkselect(ObservableList<Model> checkSelected) {
 		if (checkSelected.isEmpty()) {
 			return false;
 		} else {
@@ -211,16 +242,12 @@ public class Controller {
 	 * <br> Falls kein Element ausgewählt wurde, erscheint eine Fehlermeldung.
 	 * <br> Falls ein Element ausgewählt wurde, wird die Methode editkatdelButtonClicked() aufgerufen.
 	 */
-	public static void checkselectkat() {
-		ObservableList<String> checkSelected;
-		checkSelected = View.listView.getSelectionModel().getSelectedItems();
-		
-		if (checkSelected.isEmpty()) {
-			warnungFenster("Sie haben kein Element ausgewählt!");
-//			return true;
+	public static boolean checkselectkat(String checkSelected) {
+		if (!checkSelected.isEmpty()) {
+			return true;
 		} else {
-			editkatdelButtonClicked();
-//			return false;
+			warnungFenster("Sie haben kein Element ausgewählt!");
+			return false;
 		}
 	}
 	
@@ -229,9 +256,9 @@ public class Controller {
 	 * <br> Hier wird überprüft, ob die ausgewählte Kategorie noch Produkte enthält. 
 	 * Falls ja, kann diese Kategorie nicht gelöscht werden.
 	 */
-	public static void editkatdelButtonClicked() {
-		String delkat = View.listView.getSelectionModel().getSelectedItem();
-		
+	public static void editkatdelButtonClicked(String delkat) {
+//		String delkat = View.listView.getSelectionModel().getSelectedItem();
+//		
 		if (checkalreadyexist(delkat, 1)) {
 			warnungFenster("Mindestens ein Produkt ist noch in dieser Kategorie!");
 		} else {
@@ -288,15 +315,15 @@ public class Controller {
 	/**
 	 * Die eingegebene Kategorie wird in die kategorieliste hinzugefügt, wenn diese nicht bereits vorhanden ist.
 	 */
-	public static void editkataddButtonClicked() {
-		String katadd = View.editkatInput.getText();
+	public static void editkataddButtonClicked(String katadd) {
+//		String katadd = View.editkatInput.getText();
 		if (katadd.isEmpty()) {
 			warnungFenster("Bitte überprüfen Sie Ihre Eingabe!");
 		} else if(Model.checkkategorieliste(katadd)){
 			warnungFenster("Diese Kategorie existiert bereits!");
 		}else {
 			Model.kategorieliste.add(katadd);
-			View.editkatInput.clear();
+			View.editkatInput.clear(); //Textfeld zum Ausgangspunkt zurücksetzen
 			View.listView.getItems().clear();
 			View.listView.getItems().addAll(Model.kategorieliste);
 		}
@@ -306,8 +333,8 @@ public class Controller {
 	 * Es wird bei dieser Methode das "Kategorie bearbeiten" Fenster geschlossen.
 	 * <br> Der Benutzer wird darauf hingewiesen, wenn noch eine Eingabe nicht abgeschlossen ist und gefragt, ob das Fenster geschlossen werden soll.
 	 */
-	public static void editkatabortButtonClicked() {
-		if (View.editkatInput.getText().isEmpty()) {
+	public static void editkatabortButtonClicked(String editkattext) {
+		if (editkattext.isEmpty()) {
 			View.editkatwindow.close();
 		} else {
 			if (confirmabortwindow()) {
@@ -403,11 +430,9 @@ public class Controller {
 	 * In der Methode werden die Daten nach der Eingabe des Benutzers in der Sucheliste durchsucht und dargestellt.
 	 * @param mainChoiceBox - die Auswahl des Benutzers, in welcher Spalte er die Tabelle durchsuchen will
 	 */
-	public static void searchButtonClicked(ChoiceBox<String> mainChoiceBox) {
+	public static void searchButtonClicked(ChoiceBox<String> mainChoiceBox, String searchtext) {
 		searchliste.clear();
-//		System.out.println(searchliste);
-//		System.out.println("hallo");
-		String searchtext = View.SearchInput.getText().toLowerCase();
+//		String searchtext = View.SearchInput.getText().toLowerCase();
 		String auswahltext = mainChoiceBox.getValue(); //"Name", "Platz", "Preis", "Anzahl", "Gewicht", "Kategorie", "Eigenschaften"
 		if (searchtext.isEmpty()) {
 			warnungFenster("Bitte geben Sie etwas in die Suchleiste ein!");
@@ -512,10 +537,10 @@ public class Controller {
 	}
 	
 	/**
-	 * Diese Methode zeigt wieder alle Daten in der Tabelle an.
+	 * Diese Methode setzt die Suchleiste zurück und zeigt wieder alle Daten in der Tabelle an.
 	 */
 	public static void resetButtonClicked() {
-		View.SearchInput.clear();
+		View.SearchInput.clear(); //Suchleiste zurücksetzen
 		View.table.setItems(Model.objektliste);
 	}
 	

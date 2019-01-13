@@ -148,7 +148,11 @@ public class View extends Application {
 			// Bearbeiten - Knopf
 			Button editButton = new Button("Bearbeiten");
 			editButton.setOnAction(e -> {
-				if (!Controller.checkselect()) {	
+				
+				ObservableList<Model> checkSelected;
+				checkSelected = table.getSelectionModel().getSelectedItems();
+				
+				if (!Controller.checkselect(checkSelected)) {	
 					Controller.warnungFenster("Sie haben kein Element ausgewählt!");
 				} else {
 					editwindow();
@@ -162,13 +166,19 @@ public class View extends Application {
 			// Löschen - Knopf
 			Button deleteButton = new Button("Löschen");
 			deleteButton.setOnAction(e -> {
-				if (!Controller.checkselect()) {
+				
+				ObservableList<Model> checkSelected;
+				checkSelected = table.getSelectionModel().getSelectedItems();
+				
+				if (!Controller.checkselect(checkSelected)) {
 					Controller.warnungFenster("Sie haben kein Element ausgewählt!");
-				} else {
-					if (Controller.confirmdeletewindow()) {
-						Controller.deleteButtonClicked();
-					}
+				} else if (Controller.confirmdeletewindow()) {
+					ObservableList<Model> productSelected, allProducts;
+					allProducts = table.getItems();
+					productSelected = table.getSelectionModel().getSelectedItems();
+					Controller.deleteButtonClicked(allProducts, productSelected);
 				}
+				
 			});
 			
 			// Beenden - Knopf
@@ -194,7 +204,7 @@ public class View extends Application {
 			
 			// Suchen - Knopf
 			Button searchButton = new Button("Suchen");
-			searchButton.setOnAction(e -> Controller.searchButtonClicked(mainChoiceBox));
+			searchButton.setOnAction(e -> Controller.searchButtonClicked(mainChoiceBox, SearchInput.getText().toLowerCase()));
 			
 			// Beenden - Knopf
 			Button resetButton = new Button("Zurücksetzen");
@@ -237,125 +247,140 @@ public class View extends Application {
 	public static void addwindow() {
 		
 		// Eintrag hinzufügen - Fenster
-		
-		addwindow.setTitle("Penfactory - Dateneintrag erstellen");
-		addwindow.setWidth(400);
-		addwindow.resizableProperty().setValue(Boolean.FALSE);
-		addwindow.setOnCloseRequest(e -> {
-			e.consume();
-			if (Controller.confirmabortwindow()) {
-				addwindow.close();
-			}
-		});
-		
-		Text addscenetitle = new Text("Neuer Eintrag");
-		addscenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		
-		Label addlabel1 = new Label();
-		addlabel1.setText("Produktname:");
-		//name input
-		nameInput = new TextField();
-		nameInput.setPromptText("Produktname");
-		nameInput.setPrefWidth(100);
-
-		
-		Label addlabel2 = new Label();
-		addlabel2.setText("Produktplatz:");	
-		//platz input
-		platzInput = new TextField();
-		platzInput.setPromptText("Produktplatz");
-		platzInput.setPrefWidth(100);
-		
-		
-		Label addlabel3 = new Label();
-		addlabel3.setText("Produktpreis (€):");
-		//preis input
-		preisInput = new TextField();
-		preisInput.setPromptText("Produktpreis (€) z.B. 2.00 ");
-		preisInput.setPrefWidth(100);
-		
-		Label addlabel4 = new Label();
-		addlabel4.setText("Produktanzahl:");
-		//anzahl input
-		anzahlInput = new TextField();
-		anzahlInput.setPromptText("Produktanzahl z.B. 2");
-		anzahlInput.setPrefWidth(100);
-		
-		
-		Label addlabel5 = new Label();
-		addlabel5.setText("Produktgewicht (g):");
-		//Gewicht input
-		gewichtInput = new TextField();
-		gewichtInput.setPromptText("Produktgewicht (g) z.B. 2");
-		gewichtInput.setPrefWidth(120);
-		
-		
-		Label addlabel6 = new Label();
-		addlabel6.setText("Produktkategorie:");
-		//kategorie input
-		//get items from the kategorielist
-		System.out.println(Model.kategorieliste);
-		addChoiceBox.getItems().clear();
-		addChoiceBox.getItems().add("Kategorie wählen...");
-		addChoiceBox.getItems().addAll(Model.kategorieliste);
-		addChoiceBox.setValue("Kategorie wählen...");
-		addChoiceBox.setMinWidth(200);
-
-		
-		Label addlabel7 = new Label();
-		addlabel7.setText("Produkteigenschaften:");
-		//eigenschaften input
-		eigenschaftenInput = new TextField();
-		eigenschaftenInput.setPromptText("Produkteigenschaften");
-		eigenschaftenInput.setPrefWidth(150);
-		
-		// Speichern Knopf
-		Button saveButton = new Button("Hinzufügen");
-		saveButton.setOnAction(e -> Controller.saveButtonClicked(addChoiceBox));
-		
-		// Abbrechen Knopf
-		Button abortButton = new Button("Abbrechen");
-		abortButton.setOnAction(e -> {
-			if (Controller.confirmabortwindow()) {
-				addwindow.close();
-			}
-		});
-		
-		// Virtuelle Box für die Knöpfe
-		HBox addhBox = new HBox();
-		addhBox.setPadding(new Insets(10,10,10,10)); //rand um die HBox
-		addhBox.setSpacing(10); //Platz zwischen den Elementen
-		addhBox.setAlignment(Pos.BOTTOM_RIGHT);
-		addhBox.getChildren().addAll(saveButton, abortButton);
-		
-		// Ein Gitternetz um die Labels und Texteingabefelder zu sortieren und darzustellen
-		GridPane addgrid = new GridPane();
-		addgrid.setAlignment(Pos.CENTER);
-		addgrid.setHgap(10);
-		addgrid.setVgap(10);
-		addgrid.setPadding(new Insets(10,10,10,10));
-		addgrid.add(addscenetitle, 0, 0, 2, 1);
-		addgrid.add(addlabel1, 0, 1);
-		addgrid.add(nameInput, 1, 1);
-		addgrid.add(addlabel2, 0, 2);
-		addgrid.add(platzInput, 1, 2);
-		addgrid.add(addlabel3, 0, 3);
-		addgrid.add(preisInput, 1, 3);
-		addgrid.add(addlabel4, 0, 4);
-		addgrid.add(anzahlInput, 1, 4);
-		addgrid.add(addlabel5, 0, 5);
-		addgrid.add(gewichtInput, 1, 5);
-		addgrid.add(addlabel6, 0, 6);
-		addgrid.add(addChoiceBox, 1, 6);
-		addgrid.add(addlabel7, 0, 7);
-		addgrid.add(eigenschaftenInput, 1, 7);
-		addgrid.add(addhBox, 1, 8);
-		
-		BorderPane addBorderPane = new BorderPane();
-		addBorderPane.setCenter(addgrid);
-		Scene addscene = new Scene(addBorderPane, 500, 400);
-		addwindow.setScene(addscene);
-		addwindow.show();
+		if (!addwindow.isShowing()) {
+			addwindow.setTitle("Penfactory - Dateneintrag erstellen");
+			addwindow.setWidth(400);
+			addwindow.resizableProperty().setValue(Boolean.FALSE);
+			addwindow.setOnCloseRequest(e -> {
+				e.consume();
+				if (Controller.confirmabortwindow()) {
+					addwindow.close();
+				}
+			});
+			
+			Text addscenetitle = new Text("Neuer Eintrag");
+			addscenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+			
+			Label addlabel1 = new Label();
+			addlabel1.setText("Produktname:");
+			//name input
+			nameInput = new TextField();
+			nameInput.setPromptText("Produktname");
+			nameInput.setPrefWidth(100);
+	
+			
+			Label addlabel2 = new Label();
+			addlabel2.setText("Produktplatz:");	
+			//platz input
+			platzInput = new TextField();
+			platzInput.setPromptText("Produktplatz");
+			platzInput.setPrefWidth(100);
+			
+			
+			Label addlabel3 = new Label();
+			addlabel3.setText("Produktpreis (€):");
+			//preis input
+			preisInput = new TextField();
+			preisInput.setPromptText("Produktpreis (€) z.B. 2.00 ");
+			preisInput.setPrefWidth(100);
+			
+			Label addlabel4 = new Label();
+			addlabel4.setText("Produktanzahl:");
+			//anzahl input
+			anzahlInput = new TextField();
+			anzahlInput.setPromptText("Produktanzahl z.B. 2");
+			anzahlInput.setPrefWidth(100);
+			
+			
+			Label addlabel5 = new Label();
+			addlabel5.setText("Produktgewicht (g):");
+			//Gewicht input
+			gewichtInput = new TextField();
+			gewichtInput.setPromptText("Produktgewicht (g) z.B. 2");
+			gewichtInput.setPrefWidth(120);
+			
+			
+			Label addlabel6 = new Label();
+			addlabel6.setText("Produktkategorie:");
+			//kategorie input
+			//get items from the kategorielist
+			System.out.println(Model.kategorieliste);
+			addChoiceBox.getItems().clear();
+			addChoiceBox.getItems().add("Kategorie wählen...");
+			addChoiceBox.getItems().addAll(Model.kategorieliste);
+			addChoiceBox.setValue("Kategorie wählen...");
+			addChoiceBox.setMinWidth(200);
+	
+			
+			Label addlabel7 = new Label();
+			addlabel7.setText("Produkteigenschaften:");
+			//eigenschaften input
+			eigenschaftenInput = new TextField();
+			eigenschaftenInput.setPromptText("Produkteigenschaften");
+			eigenschaftenInput.setPrefWidth(150);
+			
+			// Speichern Knopf
+			Button saveButton = new Button("Hinzufügen");
+			saveButton.setOnAction(e -> {
+				if (Controller.checkInput(nameInput, platzInput, preisInput, anzahlInput, gewichtInput, eigenschaftenInput)) {
+						Controller.saveButtonClicked(
+								addChoiceBox,
+								nameInput.getText(),
+								Integer.parseInt(platzInput.getText()),
+								new BigDecimal(preisInput.getText()),
+								Integer.parseInt(anzahlInput.getText()),
+								Integer.parseInt(gewichtInput.getText()),
+								eigenschaftenInput.getText()
+								);
+				}
+			});
+			
+			// Abbrechen Knopf
+			Button abortButton = new Button("Abbrechen");
+			abortButton.setOnAction(e -> {
+				if (Controller.confirmabortwindow()) {
+					addwindow.close();
+				}
+			});
+			
+			// Virtuelle Box für die Knöpfe
+			HBox addhBox = new HBox();
+			addhBox.setPadding(new Insets(10,10,10,10)); //rand um die HBox
+			addhBox.setSpacing(10); //Platz zwischen den Elementen
+			addhBox.setAlignment(Pos.BOTTOM_RIGHT);
+			addhBox.getChildren().addAll(saveButton, abortButton);
+			
+			// Ein Gitternetz um die Labels und Texteingabefelder zu sortieren und darzustellen
+			GridPane addgrid = new GridPane();
+			addgrid.setAlignment(Pos.CENTER);
+			addgrid.setHgap(10);
+			addgrid.setVgap(10);
+			addgrid.setPadding(new Insets(10,10,10,10));
+			addgrid.add(addscenetitle, 0, 0, 2, 1);
+			addgrid.add(addlabel1, 0, 1);
+			addgrid.add(nameInput, 1, 1);
+			addgrid.add(addlabel2, 0, 2);
+			addgrid.add(platzInput, 1, 2);
+			addgrid.add(addlabel3, 0, 3);
+			addgrid.add(preisInput, 1, 3);
+			addgrid.add(addlabel4, 0, 4);
+			addgrid.add(anzahlInput, 1, 4);
+			addgrid.add(addlabel5, 0, 5);
+			addgrid.add(gewichtInput, 1, 5);
+			addgrid.add(addlabel6, 0, 6);
+			addgrid.add(addChoiceBox, 1, 6);
+			addgrid.add(addlabel7, 0, 7);
+			addgrid.add(eigenschaftenInput, 1, 7);
+			addgrid.add(addhBox, 1, 8);
+			
+			BorderPane addBorderPane = new BorderPane();
+			addBorderPane.setCenter(addgrid);
+			Scene addscene = new Scene(addBorderPane, 500, 400);
+			addwindow.setScene(addscene);
+			addwindow.show();
+		} else {
+			Controller.warnungFenster("Bitte schließen Sie erst das erste 'Eintrag hinzufügen' - Fenster!");
+		}
 	}
 	
 	/**
@@ -366,129 +391,147 @@ public class View extends Application {
 	public static void editwindow() {
 		
 		// Eine Liste 
-		ObservableList<Model> productSelected;
-		productSelected = View.table.getSelectionModel().getSelectedItems();
-		String editgetName = productSelected.get(0).getName();
-		int editgetPlatz = productSelected.get(0).getPlatz();
-
-		editwindow.setTitle("Penfactory - Dateneintrag bearbeiten");
-		editwindow.setWidth(400);
-		editwindow.resizableProperty().setValue(Boolean.FALSE);
-		editwindow.setOnCloseRequest(e -> {
-			e.consume();
-			if (Controller.confirmabortwindow()) {
-				editwindow.close();
-			}
-		});
-		
-		Text editscenetitle = new Text("Eintrag bearbeiten");
-		editscenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-
-		
-		Label editlabel1 = new Label();
-		editlabel1.setText("Produktname:");
-		//name input
-		editnameInput = new TextField();
-		editnameInput.setText(productSelected.get(0).getName());
-		editnameInput.setPrefWidth(100);
-
-		
-		Label editlabel2 = new Label();
-		editlabel2.setText("Produktplatz:");	
-		//platz input
-		editplatzInput = new TextField();
-		editplatzInput.setText(String.valueOf(productSelected.get(0).getPlatz()));
-		editplatzInput.setPrefWidth(100);
-		
-		
-		Label editlabel3 = new Label();
-		editlabel3.setText("Produktpreis (€):");
-		//preis input
-		editpreisInput = new TextField();
-		editpreisInput.setText(String.valueOf(productSelected.get(0).getPreis()));
-		editpreisInput.setPrefWidth(100);
-		
-		Label editlabel4 = new Label();
-		editlabel4.setText("Produktanzahländerung:");
-		//anzahl input
-		editanzahlInput = new TextField();
-		editanzahlInput.setText("0");
-		editanzahlInput.setPrefWidth(100);
-		int alteAnzahl = productSelected.get(0).getAnzahl();
-		
-		
-		Label editlabel5 = new Label();
-		editlabel5.setText("Produktgewicht (g):");
-		//Gewicht input
-		editgewichtInput = new TextField();
-		editgewichtInput.setText(String.valueOf(productSelected.get(0).getGewicht()));
-		editgewichtInput.setPrefWidth(120);
-		
-		
-		Label editlabel6 = new Label();
-		editlabel6.setText("Produktkategorie:");
-		//kategorie input
-		ChoiceBox<String> editaddChoiceBox = new ChoiceBox<>();
-		//get items from the kategorielist
-		editaddChoiceBox.getItems().addAll(Model.kategorieliste);
-		editaddChoiceBox.setValue(productSelected.get(0).getKategorie());
-		editaddChoiceBox.setMinWidth(200);
-
-		
-		Label editlabel7 = new Label();
-		editlabel7.setText("Produkteigenschaften:");
-		//eigenschaften input
-		editeigenschaftenInput = new TextField();
-		editeigenschaftenInput.setText(productSelected.get(0).getEigenschaften());
-		editeigenschaftenInput.setPrefWidth(150);
-		
-		//Buttons
-		Button editsaveButton = new Button("Speichern");
-		editsaveButton.setOnAction(e -> {
-			Controller.editsaveButtonClicked(productSelected, alteAnzahl, editaddChoiceBox, editgetName, editgetPlatz);
-		});
-		
-		Button editabortButton = new Button("Abbrechen");
-		editabortButton.setOnAction(e -> {
-			if (Controller.confirmabortwindow()) {
-				editwindow.close();
-			}
-		});
-		
-		HBox edithBox = new HBox();
-		edithBox.setPadding(new Insets(10,10,10,10)); //rand um die HBox
-		edithBox.setSpacing(10); //Platz zwischen den Elementen
-		edithBox.setAlignment(Pos.BOTTOM_RIGHT);
-		edithBox.getChildren().addAll(editsaveButton, editabortButton);
-		
-		GridPane editgrid = new GridPane();
-		editgrid.setAlignment(Pos.CENTER);
-		editgrid.setHgap(10);
-		editgrid.setVgap(10);
-		editgrid.setPadding(new Insets(10,10,10,10));
-		editgrid.add(editscenetitle, 0, 0, 2, 1);
-		editgrid.add(editlabel1, 0, 1);
-		editgrid.add(editnameInput, 1, 1);
-		editgrid.add(editlabel2, 0, 2);
-		editgrid.add(editplatzInput, 1, 2);
-		editgrid.add(editlabel3, 0, 3);
-		editgrid.add(editpreisInput, 1, 3);
-		editgrid.add(editlabel4, 0, 4);
-		editgrid.add(editanzahlInput, 1, 4);
-		editgrid.add(editlabel5, 0, 5);
-		editgrid.add(editgewichtInput, 1, 5);
-		editgrid.add(editlabel6, 0, 6);
-		editgrid.add(editaddChoiceBox, 1, 6);
-		editgrid.add(editlabel7, 0, 7);
-		editgrid.add(editeigenschaftenInput, 1, 7);
-		editgrid.add(edithBox, 1, 8);
-		
-		BorderPane editBorderPane = new BorderPane();
-		editBorderPane.setCenter(editgrid);
-		
-		Scene editscene = new Scene(editBorderPane, 600, 400);
-		editwindow.setScene(editscene);
-		editwindow.show();
+		if (!editwindow.isShowing()) {
+			ObservableList<Model> productSelected;
+			productSelected = View.table.getSelectionModel().getSelectedItems();
+			String editgetselectedName = productSelected.get(0).getName();
+			int editgetselectedPlatz = productSelected.get(0).getPlatz();
+	
+			editwindow.setTitle("Penfactory - Dateneintrag bearbeiten");
+			editwindow.setWidth(400);
+			editwindow.resizableProperty().setValue(Boolean.FALSE);
+			editwindow.setOnCloseRequest(e -> {
+				e.consume();
+				if (Controller.confirmabortwindow()) {
+					editwindow.close();
+				}
+			});
+			
+			Text editscenetitle = new Text("Eintrag bearbeiten");
+			editscenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+	
+			
+			Label editlabel1 = new Label();
+			editlabel1.setText("Produktname:");
+			//name input
+			editnameInput = new TextField();
+			editnameInput.setText(productSelected.get(0).getName());
+			editnameInput.setPrefWidth(100);
+	
+			
+			Label editlabel2 = new Label();
+			editlabel2.setText("Produktplatz:");	
+			//platz input
+			editplatzInput = new TextField();
+			editplatzInput.setText(String.valueOf(productSelected.get(0).getPlatz()));
+			editplatzInput.setPrefWidth(100);
+			
+			
+			Label editlabel3 = new Label();
+			editlabel3.setText("Produktpreis (€):");
+			//preis input
+			editpreisInput = new TextField();
+			editpreisInput.setText(String.valueOf(productSelected.get(0).getPreis()));
+			editpreisInput.setPrefWidth(100);
+			
+			Label editlabel4 = new Label();
+			editlabel4.setText("Produktanzahländerung:");
+			//anzahl input
+			editanzahlInput = new TextField();
+			editanzahlInput.setText("0");
+			editanzahlInput.setPrefWidth(100);
+			int alteAnzahl = productSelected.get(0).getAnzahl();
+			
+			
+			Label editlabel5 = new Label();
+			editlabel5.setText("Produktgewicht (g):");
+			//Gewicht input
+			editgewichtInput = new TextField();
+			editgewichtInput.setText(String.valueOf(productSelected.get(0).getGewicht()));
+			editgewichtInput.setPrefWidth(120);
+			
+			
+			Label editlabel6 = new Label();
+			editlabel6.setText("Produktkategorie:");
+			//kategorie input
+			ChoiceBox<String> editaddChoiceBox = new ChoiceBox<>();
+			//get items from the kategorielist
+			editaddChoiceBox.getItems().addAll(Model.kategorieliste);
+			editaddChoiceBox.setValue(productSelected.get(0).getKategorie());
+			editaddChoiceBox.setMinWidth(200);
+	
+			
+			Label editlabel7 = new Label();
+			editlabel7.setText("Produkteigenschaften:");
+			//eigenschaften input
+			editeigenschaftenInput = new TextField();
+			editeigenschaftenInput.setText(productSelected.get(0).getEigenschaften());
+			editeigenschaftenInput.setPrefWidth(150);
+			
+			//Buttons
+			Button editsaveButton = new Button("Speichern");
+			editsaveButton.setOnAction(e -> {
+				if (Controller.checkInput(editnameInput, editplatzInput, editpreisInput, editanzahlInput, editgewichtInput, editeigenschaftenInput)) {
+						Controller.editsaveButtonClicked(
+								productSelected, 
+								alteAnzahl, 
+								editaddChoiceBox, 
+								editgetselectedName, 
+								editgetselectedPlatz,
+								editnameInput.getText(),
+								Integer.parseInt(editplatzInput.getText()),
+								new BigDecimal(editpreisInput.getText()),
+								Integer.parseInt(editanzahlInput.getText()),
+								Integer.parseInt(editgewichtInput.getText()),
+								editeigenschaftenInput.getText()
+								);
+				}	
+			});
+			
+			Button editabortButton = new Button("Abbrechen");
+			editabortButton.setOnAction(e -> {
+				if (Controller.confirmabortwindow()) {
+					editwindow.close();
+				}
+			});
+			
+			HBox edithBox = new HBox();
+			edithBox.setPadding(new Insets(10,10,10,10)); //rand um die HBox
+			edithBox.setSpacing(10); //Platz zwischen den Elementen
+			edithBox.setAlignment(Pos.BOTTOM_RIGHT);
+			edithBox.getChildren().addAll(editsaveButton, editabortButton);
+			
+			GridPane editgrid = new GridPane();
+			editgrid.setAlignment(Pos.CENTER);
+			editgrid.setHgap(10);
+			editgrid.setVgap(10);
+			editgrid.setPadding(new Insets(10,10,10,10));
+			editgrid.add(editscenetitle, 0, 0, 2, 1);
+			editgrid.add(editlabel1, 0, 1);
+			editgrid.add(editnameInput, 1, 1);
+			editgrid.add(editlabel2, 0, 2);
+			editgrid.add(editplatzInput, 1, 2);
+			editgrid.add(editlabel3, 0, 3);
+			editgrid.add(editpreisInput, 1, 3);
+			editgrid.add(editlabel4, 0, 4);
+			editgrid.add(editanzahlInput, 1, 4);
+			editgrid.add(editlabel5, 0, 5);
+			editgrid.add(editgewichtInput, 1, 5);
+			editgrid.add(editlabel6, 0, 6);
+			editgrid.add(editaddChoiceBox, 1, 6);
+			editgrid.add(editlabel7, 0, 7);
+			editgrid.add(editeigenschaftenInput, 1, 7);
+			editgrid.add(edithBox, 1, 8);
+			
+			BorderPane editBorderPane = new BorderPane();
+			editBorderPane.setCenter(editgrid);
+			
+			Scene editscene = new Scene(editBorderPane, 600, 400);
+			editwindow.setScene(editscene);
+			editwindow.show();
+		} else {
+			Controller.warnungFenster("Bitte schließen Sie das erste 'Eintrag bearbeiten' - Fenster!");
+		}
 	}
 	
 	/**
@@ -520,15 +563,21 @@ public class View extends Application {
 		
 		// Schließen Knopf
 		Button editkatabortButton = new Button("Schließen");
-		editkatabortButton.setOnAction(e -> Controller.editkatabortButtonClicked());
+		editkatabortButton.setOnAction(e -> Controller.editkatabortButtonClicked(editkatInput.getText()));
 		
 		// Hinzufügen Knopf
 		Button editkataddButton = new Button("Hinzufügen");
-		editkataddButton.setOnAction(e -> Controller.editkataddButtonClicked());
+		editkataddButton.setOnAction(e -> Controller.editkataddButtonClicked(editkatInput.getText()));
 		editkataddButton.setMinWidth(150);
 		
 		Button editkatdelButton = new Button("Löschen");
-		editkatdelButton.setOnAction(e -> Controller.checkselectkat());
+		editkatdelButton.setOnAction(e -> {
+			String selectedKat;
+			selectedKat = listView.getSelectionModel().getSelectedItem();
+			if (Controller.checkselectkat(selectedKat)) {
+				Controller.editkatdelButtonClicked(selectedKat);
+			}
+		});
 		editkatdelButton.setMinWidth(150);
 
 		// Eingabefeld für neue Kategorie
